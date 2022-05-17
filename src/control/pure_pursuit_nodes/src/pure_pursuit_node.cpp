@@ -39,7 +39,7 @@ PurePursuitNode::PurePursuitNode(
   const std::string & node_name,
   const std::string & node_namespace)
 : ControllerBaseNode{node_name, node_namespace, "ctrl_cmd", "current_pose",
-    "tf", "trajectory", "ctrl_diag"}
+    "tf", "trajectory", "ctrl_diag" , "tf_static"}
 {
   pure_pursuit::Config cfg{
     static_cast<float32_t>(declare_parameter(

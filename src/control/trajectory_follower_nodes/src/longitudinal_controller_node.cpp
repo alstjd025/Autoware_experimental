@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #include <algorithm>
 #include <limits>
 #include <memory>
@@ -37,7 +36,7 @@ LongitudinalController::LongitudinalController(const rclcpp::NodeOptions & node_
 : Node("longitudinal_controller", node_options), m_tf_listener(m_tf_buffer, this, false)
 {
   using std::placeholders::_1;
-
+  
   // parameters timer
   m_control_rate = declare_parameter("control_rate").get<float64_t>();
 
@@ -181,8 +180,7 @@ LongitudinalController::LongitudinalController(const rclcpp::NodeOptions & node_
     "output/longitudinal/slope_angle", rclcpp::QoS{1});
   m_pub_debug = create_publisher<autoware_auto_system_msgs::msg::Float32MultiArrayDiagnostic>(
     "output/longitudinal/diagnostic", rclcpp::QoS{1});
-
-
+  
   // Timer
   {
     auto timer_callback = std::bind(&LongitudinalController::callbackTimerControl, this);

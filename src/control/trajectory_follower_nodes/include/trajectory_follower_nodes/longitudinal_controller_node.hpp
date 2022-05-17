@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//minsung
 
 #ifndef TRAJECTORY_FOLLOWER_NODES__LONGITUDINAL_CONTROLLER_NODE_HPP_
 #define TRAJECTORY_FOLLOWER_NODES__LONGITUDINAL_CONTROLLER_NODE_HPP_
@@ -38,6 +39,7 @@
 #include "trajectory_follower/lowpass_filter.hpp"
 #include "trajectory_follower/pid.hpp"
 #include "trajectory_follower/smooth_stop.hpp"
+
 
 namespace autoware
 {
@@ -78,7 +80,7 @@ private:
     float64_t slope_angle{0.0};
     float64_t dt{0.0};
   };
-
+  
   // ros variables
   rclcpp::Subscription<autoware_auto_vehicle_msgs::msg::VehicleKinematicState>::SharedPtr
     m_sub_current_state;

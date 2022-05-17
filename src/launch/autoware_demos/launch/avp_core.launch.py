@@ -390,7 +390,7 @@ def generate_launch_description():
         off_map_obstacles_filter_param,
         vehicle_characteristics_param,
         vehicle_constants_manager_param,
-        euclidean_clustering,
+        #euclidean_clustering,
         ray_ground_classifier,
         scan_downsampler,
         point_cloud_fusion_node,

@@ -38,7 +38,7 @@ void BehaviorPlannerNode::init()
 {
   using rclcpp::QoS;
   using namespace std::chrono_literals;
-
+  RCLCPP_INFO(get_logger(), "BEHAVIOR PLANNER!!!!!! INIT");
   // Setup planner
   const auto cg_to_front_m =
     static_cast<float32_t>(declare_parameter("vehicle.cg_to_front_m").get<float64_t>());
@@ -148,6 +148,8 @@ void BehaviorPlannerNode::init()
     this->create_publisher<geometry_msgs::msg::PoseArray>("debug/global_path", QoS{10});
   m_gear_command_pub =
     this->create_publisher<GearCommand>("gear_command", QoS{10});
+
+  RCLCPP_INFO(get_logger(), "BEHAVIOR PLANNER!!!!!! INIT SUCCEED");
 }
 
 void BehaviorPlannerNode::goal_response_callback(

@@ -208,7 +208,7 @@ void Lanelet2GlobalPlannerNode::send_global_path(
   global_route.header = header;
   global_route.start_pose = start_point.pose;
   global_route.goal_pose = end_point.pose;
-
+  
   for (const auto & route_id : route) {
     // add data to the global path
     autoware_auto_mapping_msgs::msg::MapPrimitive primitive;

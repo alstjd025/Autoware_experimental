@@ -69,7 +69,7 @@ def generate_launch_description():
       cmd=["python3", "-m", "http.server", "8000"],
       cwd=web_files_root
     )
-
+    
     return LaunchDescription([
         with_rviz_param,
         rviz_cfg_path_param,

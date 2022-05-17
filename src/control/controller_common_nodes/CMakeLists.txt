@@ -14,6 +14,10 @@ autoware_set_compile_options(${PROJECT_NAME})
 # Setting a system include is needed to avoid having an explicit Eigen dependency.
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
 
+set(CONTOLLER_COMMON_NODE_EXE controller_common_node_exe)
+ament_auto_add_executable(${CONTOLLER_COMMON_NODE_EXE} src/controller_common_nodes/controller_base_node_main.cpp)
+autoware_set_compile_options(${CONTOLLER_COMMON_NODE_EXE})
+
 ### Test
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

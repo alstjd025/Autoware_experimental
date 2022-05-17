@@ -39,9 +39,10 @@ def generate_launch_description():
     map_yaml_file_path = os.path.join(
         map_data_prefix, 'data/autonomoustuff_parking_lot_lgsvl.yaml'
     )
-    map_pcd_file_path = os.path.join(
-        map_data_prefix, 'data/autonomoustuff_parking_lot_lgsvl.pcd'
-    )
+    #map_pcd_file_path = os.path.join(
+   #     map_data_prefix, 'data/autonomoustuff_parking_lot_lgsvl.pcd'
+   # )
+    map_pcd_file_path = os.path.join('/opt/AutowareAuto/share/autoware_demos/', 'data/autonomoustuff_parking_lot_lgsvl.pcd')
     map_yaml_file_param = DeclareLaunchArgument(
         'map_yaml_file_arg',
         default_value=map_yaml_file_path,

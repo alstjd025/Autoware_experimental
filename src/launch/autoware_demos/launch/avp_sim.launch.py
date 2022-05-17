@@ -54,17 +54,27 @@ def generate_launch_description():
         avp_demo_pkg_prefix, 'param/avp/longitudinal_controller.param.yaml')
     latlon_muxer_param_file = os.path.join(
         avp_demo_pkg_prefix, 'param/avp/latlon_muxer.param.yaml')
+    pure_pursuit_param_file = os.path.join(
+        avp_demo_pkg_prefix, 'param/pure_pursuit.param.yaml')
+    controller_testing_param_file = os.path.join(
+        avp_demo_pkg_prefix, "param/defaults.param.yaml"
+    )
+    mpc_controller_param_file = os.path.join(
+        avp_demo_pkg_prefix, "param/mpc_defaults.yaml"
+    )
 
     urdf_pkg_prefix = get_package_share_directory('lexus_rx_450h_description')
     urdf_path = os.path.join(urdf_pkg_prefix, 'urdf/lexus_rx_450h.urdf')
     with open(urdf_path, 'r') as infp:
         urdf_file = infp.read()
 
-    map_pcd_file = os.path.join(
-        avp_demo_pkg_prefix, 'data/autonomoustuff_parking_lot_lgsvl.pcd')
+    map_pcd_file = os.path.join("","/opt/AutowareAuto/share/autoware_demos/data/autonomoustuff_parking_lot.pcd")
+
+    # map_pcd_file = os.path.join(
+    #     avp_demo_pkg_prefix, 'data/autonomoustuff_parking_lot_lgsvl.pcd')
     map_yaml_file = os.path.join(
         avp_demo_pkg_prefix, 'data/autonomoustuff_parking_lot_lgsvl.yaml')
-
+    print(map_pcd_file)
     # Arguments
 
     with_lgsvl_param = DeclareLaunchArgument(
@@ -112,6 +122,40 @@ def generate_launch_description():
         default_value=latlon_muxer_param_file,
         description='Path to config file for lateral and longitudinal control commands muxer'
     )
+    controller_testing_param = DeclareLaunchArgument(
+        "controller_testing_param_file",
+        default_value=controller_testing_param_file,
+        description="Path to config file for Controller Testing",
+    )
+    mpc_controller_param = DeclareLaunchArgument(
+        "mpc_controller_param_file",
+        default_value=mpc_controller_param_file,
+        description="Path to config file to MPC Controller",
+    )
+    pure_pursuit_controller_param = DeclareLaunchArgument(
+        'pure_pursuit_param_file',
+        default_value=pure_pursuit_param_file,
+        description='Path to config file for pp controller'
+    )
+    real_time_sim_param = DeclareLaunchArgument(
+        'real_time_sim',
+        default_value='False',
+        description='Launch RVIZ2 in addition to other nodes'
+    )
+    show_final_report_param = DeclareLaunchArgument(
+        'show_final_report',
+        default_value='False',
+        description='Show graphical report of final results'
+    )
+    controller_testing_params = [
+        LaunchConfiguration("controller_testing_param_file"),
+        {
+            'real_time_sim': LaunchConfiguration('real_time_sim'),
+            'show_final_report': LaunchConfiguration('show_final_report')
+        }
+    ]
+
+    
 
     # Nodes
 
@@ -123,7 +167,8 @@ def generate_launch_description():
         output='screen',
         parameters=[
           LaunchConfiguration('lgsvl_interface_param_file'),
-          {"lgsvl.publish_tf": True}
+          {"lgsvl.publish_tf": True},
+          {"lgsvl.control_command" : "ackerman"}
         ],
         remappings=[
             ("vehicle_control_cmd", "/lgsvl/vehicle_control_cmd"),
@@ -225,6 +270,68 @@ def generate_launch_description():
            ("output/control_cmd", "/vehicle/ackermann_vehicle_command"),
         ],
     )
+    controller_testing = Node(
+        package="controller_testing",
+        executable="controller_testing_main.py",
+        namespace="control",
+        name="controller_testing_node",
+        parameters=controller_testing_params,
+        remappings=[
+            ("vehicle_state", "/vehicle/vehicle_kinematic_state"),
+            ("planned_trajectory", "/planning/trajectory"),
+            ("control_command", "/vehicle/control_command"),
+            ("control_diagnostic", "/control/control_diagnostic"),
+        ],
+    )
+    # pure_pursuit_controller = Node(
+    #     package='pure_pursuit_nodes',
+    #     executable='pure_pursuit_node_exe',
+    #     name='pure_pursuit_node',
+    #     namespace='control',
+    #     parameters=[
+    #         LaunchConfiguration('pure_pursuit_param_file'), {},
+    #     ],
+    #     remappings=[
+    #         ("current_pose", "/vehicle/vehicle_kinematic_state"),
+    #         ("trajectory", "/planning/trajectory"),
+    #         ("ctrl_cmd", "/vehicle/control_command"),
+    #         ("ctrl_diag", "/control/control_diagnostic"),
+    #     ],
+    # )
+
+    pure_pursuit_controller = Node(
+        package='pure_pursuit_nodes',
+        executable='pure_pursuit_node_exe',
+        name='pure_pursuit_node',
+        output="screen",
+        parameters=[
+            LaunchConfiguration('pure_pursuit_param_file'),
+        ],
+        remappings=[
+            ("current_pose", "/vehicle/vehicle_kinematic_state"),
+            ("trajectory", "/planning/trajectory"),
+            ("ctrl_cmd", "/vehicle/vehicle_command"),
+            ("ctrl_diag", "/control/control_diagnostic"),
+        ],
+    )
+
+        # mpc_controller
+    mpc_controller = Node(
+        package="mpc_controller_nodes",
+        executable="mpc_controller_node_exe",
+        # namespace="control",
+        name="mpc_controller_node",
+        output="screen",
+        parameters=[LaunchConfiguration("mpc_controller_param_file")],
+        remappings=[
+            ("vehicle_kinematic_state", "/vehicle/vehicle_kinematic_state"),
+            ("trajectory", "/planning/trajectory"),
+            ("ctrl_cmd", "/vehicle/control_command"),
+            ("control_diagnostic", "/control/control_diagnostic"),
+        ],
+    )
+
+
 
     lgsvl_simulation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([lgsvl_sim_pkg_prefix, '/launch/sim.launch.py']),
@@ -258,14 +365,31 @@ def generate_launch_description():
         ndt_localizer_param,
         pc_filter_transform_param,
         vehicle_characteristics_param,
-        lat_control_param,
-        lon_control_param,
-        latlon_muxer_param,
+        
+        #for LL
+        #lat_control_param,
+        #lon_control_param,
+        #latlon_muxer_param,
+        
+        #Minsung : If you want to change controller
+        #          check lgsvl.param.yaml
+
+        #For MPC
+        mpc_controller_param,
+        mpc_controller,
+        
+
+        #For PP
+        #pure_pursuit_controller_param,
+        #pure_pursuit_controller,
+        
+        #for LL
+        #lat_control,
+        #lon_control,
+        #latlon_muxer,
+        
         urdf_publisher,
         lgsvl_interface,
-        lat_control,
-        lon_control,
-        latlon_muxer,
         map_publisher,
         ndt_localizer,
         filter_transform_vlp16_front,

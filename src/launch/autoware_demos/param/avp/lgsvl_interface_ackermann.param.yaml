@@ -6,7 +6,7 @@
     # For LL -> ackermann
     # For PP -> basic
     # For MPC -> basic
-    control_command: "basic"
+    control_command: "ackermann"
     lgsvl:
       use_nav_odometry_topic: True
       throttle:
